@@ -76,7 +76,7 @@ class Migrate {
      */
     public function install() {
         $sql = file_get_contents(__DIR__ . '/install/install.sql');
-        return $this->prepare($sql);
+        return $this->run($sql);
     }
 
 
@@ -98,15 +98,22 @@ class Migrate {
     }
 
     /**
-     * @param $sql
-     * @param array $params
+     * Run a query
+     *
+     * @param string $sql
+     * @param bool $unbuffer
      * @return \PDOStatement
      * @throws \Exception
      */
-    private function prepare($sql, $params = array()) {
+    private function run($sql, $unbuffer = true) {
         try {
             $sth = $this->dblol->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
-            $sth->execute($params);
+            $sth->execute(array());
+
+            if ($unbuffer) {
+                unset($sth);
+                return true;
+            }
             return $sth;
         } catch (\PDOException $e) {
             throw new \Exception("Query error: {$e->getMessage()} - {$sql}");
@@ -121,7 +128,7 @@ class Migrate {
      */
     private function getStart() {
         $sql = "SELECT version FROM migration_version";
-        $sth = $this->prepare($sql);
+        $sth = $this->run($sql, false);
         $line = $sth->fetch(\PDO::FETCH_ASSOC);
         return $line['version'] + 1;
     }
@@ -165,8 +172,8 @@ class Migrate {
     }
 
     private function updateDatabaseVersion($version) {
-        $sql = "UPDATE `migration_version` SET version =" . $version . " WHERE 1";
-        return $this->prepare($sql);
+        $sql = "UPDATE `migration_version` SET version =" . $version . " WHERE 1;";
+        return $this->run($sql);
     }
 
     /**
@@ -178,8 +185,9 @@ class Migrate {
     private function runSqlMigration($file) {
         try {
             $sql = file_get_contents($file);
-            return $this->prepare($sql);
+            return $this->run($sql);
         } catch (\Exception $e) {
+            echo $e->getMessage() . "\n";
             return false;
         }
     }

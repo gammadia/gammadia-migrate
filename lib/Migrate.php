@@ -44,11 +44,13 @@ class Migrate {
 
     /**
      * Execute the migration
-     * @param int $version
+     * @param int $maxVersion
      */
-    public function migrateTo($version) {
-        $files = $this->getUpcomingMigrations($version);
+    public function migrateTo($maxVersion) {
+        $files = $this->getUpcomingMigrations($maxVersion);
 
+        $successful = 0;
+        $version_before_migrations = $this->getStart() - 1;
         foreach ($files as $file) {
             $extension = substr(strrchr($file, '.'), 1);
             $version = $this->getVersionFromFilename($file);
@@ -68,6 +70,16 @@ class Migrate {
             }
 
             $this->updateDatabaseVersion($version);
+            $successful += 1;
+        }
+
+        echo "Migration over.\n";
+        if ($successful > 0) {
+            echo sprintf("Migrations done from %s to %s.\n", $version_before_migrations, $version);
+            echo $successful . " file(s) where successfully passed.\n\n";
+        } else {
+            echo "No migration. All is fine.\n";
+            echo sprintf("Your database remains at version %s.\n\n", $version_before_migrations);
         }
     }
 

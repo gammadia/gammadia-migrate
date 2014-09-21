@@ -1,0 +1,23 @@
+{
+    "name": "voilab/migrate",
+    "type": "library",
+    "description": "SQL and PHP migration tool for your web application.",
+    "homepage": "https://bitbucket.org/voilab/migrate",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Joël Poulin",
+            "email": "joel@voilab.org",
+            "homepage": "http://www.voilab.org",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "pimple/pimple": "3.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "voilab\\migrate\\": "lib/"
+        }
+    }
+}

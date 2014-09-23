@@ -76,7 +76,11 @@ class Migrate {
         echo "Migration over.\n";
         if ($successful > 0) {
             echo sprintf("Migrations done from %s to %s.\n", $version_before_migrations, $version);
-            echo $successful . " file(s) where successfully passed.\n\n";
+            if ($successful > 1) {
+                echo $successful . " files were successfully passed.\n\n";
+            } else {
+                echo $successful . " file was successfully passed.\n\n";
+            }
         } else {
             echo "No migration. All is fine.\n";
             echo sprintf("Your database remains at version %s.\n\n", $version_before_migrations);
@@ -87,7 +91,7 @@ class Migrate {
      * Execute the installation script
      */
     public function install() {
-        $sql = file_get_contents(__DIR__ . '/install/install.sql');
+        $sql = file_get_contents(__DIR__ . '/../install/install.sql');
         return $this->run($sql);
     }
 

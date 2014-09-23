@@ -2,6 +2,9 @@
 <?php
 /**
  * Set these variables according to your own configuration
+ * You'll probably want to include your own configuration file and use it here. No problem.
+ * You can change this file the way you want... You can also rename $config to another name if it
+ * conflicts with your own config file.
  *
  * @var string $autoload_path Path from this file to your composer autoload file
  * @var string $migrations_path Path where your migration files stands

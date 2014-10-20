@@ -29,7 +29,7 @@ $ php composer.phar install
 
 #### Installation
 - create a 'migrations' directory in your project
-- copy the 'command.php' file from /lib/install to the root path of your project and rename it the way you want
+- copy the 'migrate.php' file from /lib/install to the root path of your project and rename it the way you want
 - run the install.sql script in your database (it will create a small table that keep track of your current migration version).
 
 #### Usage

@@ -238,7 +238,7 @@ class Migrate {
 
     private function getVersionFromFilename($file) {
         $tmp = explode('_', $file);
-        return strstr($tmp[1], '.', true);
+        return strstr(array_pop($tmp), '.', true);
     }
 
 /* ------------ / private methods ------------------------------------------- */

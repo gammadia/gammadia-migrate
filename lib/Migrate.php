@@ -95,6 +95,29 @@ class Migrate {
         return $this->run($sql);
     }
 
+    /**
+     * Run a query
+     *
+     * @param string $sql
+     * @param bool $unbuffer
+     * @return \PDOStatement
+     * @throws \Exception
+     */
+    public function run($sql, $unbuffer = true) {
+        try {
+            $sth = $this->dblol->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+            $sth->execute(array());
+
+            if ($unbuffer) {
+                unset($sth);
+                return true;
+            }
+            return $sth;
+        } catch (\PDOException $e) {
+            throw new \Exception("Query error: {$e->getMessage()} - {$sql}");
+        }
+    }
+
 
 
 
@@ -110,29 +133,6 @@ class Migrate {
             $this->dblol->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
             throw new \Exception('Could not connect to database. Message: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Run a query
-     *
-     * @param string $sql
-     * @param bool $unbuffer
-     * @return \PDOStatement
-     * @throws \Exception
-     */
-    private function run($sql, $unbuffer = true) {
-        try {
-            $sth = $this->dblol->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
-            $sth->execute(array());
-
-            if ($unbuffer) {
-                unset($sth);
-                return true;
-            }
-            return $sth;
-        } catch (\PDOException $e) {
-            throw new \Exception("Query error: {$e->getMessage()} - {$sql}");
         }
     }
 
@@ -218,18 +218,18 @@ class Migrate {
         include_once($file);
         $classname = 'Migration' . $this->getVersionFromFilename($file);
         if (!class_exists($classname)) {
-            echo sprintf("Class %s does not exist. Please implement it in your file: %s", $classname, $file);
+            echo sprintf("Class %s does not exist. Please implement it in your file: %s\n", $classname, $file);
             return false;
         }
 
         $migration = new $classname();
 
         if (!method_exists($migration, 'go')) {
-            echo sprintf("Method go does not exist in your class %s. Please implement it.", $classname);
+            echo sprintf("Method go does not exist in your class %s. Please implement it.\n", $classname);
             return false;
         }
 
-        if (false === $migration->go()) {
+        if (false === $migration->go($this)) {
             return false;
         }
 

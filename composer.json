@@ -12,12 +12,9 @@
             "role": "Developer"
         }
     ],
-    "require": {
-        "pimple/pimple": "3.*"
-    },
     "autoload": {
         "psr-4": {
-            "voilab\\migrate\\": "lib/"
+            "Voilab\\Migrate\\": "lib/"
         }
     }
 }

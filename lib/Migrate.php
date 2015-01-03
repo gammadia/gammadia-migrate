@@ -1,5 +1,5 @@
 <?php
-namespace voilab\migrate;
+namespace Voilab\Migrate;
 
 
 class Migrate {
@@ -236,6 +236,12 @@ class Migrate {
         return true;
     }
 
+    /**
+     * Read a filename and guess its version
+     *
+     * @param string $file Migration filename
+     * @return string
+     */
     private function getVersionFromFilename($file) {
         $tmp = explode('_', $file);
         return strstr(array_pop($tmp), '.', true);

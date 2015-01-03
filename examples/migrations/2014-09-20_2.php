@@ -5,9 +5,10 @@
  */
 class Migration2 {
     /**
+     * @param \Voilab\Migrate\Migrate $migrate The Migrate instance
      * @return void|false If false, will be considered as failed migration
      */
-    public function go() {
+    public function go(\Voilab\Migrate\Migrate $migrate) {
         $messages = [];
 
         // perform some complex actions that you can't do with SQL

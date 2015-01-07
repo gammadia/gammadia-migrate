@@ -14,7 +14,7 @@ class Migrate {
 
 
 
-/* -------------- static methods -------------------------------------------- */
+    /* -------------- static methods -------------------------------------------- */
 
     /**
      * Get instance
@@ -30,7 +30,7 @@ class Migrate {
         return self::$instance;
     }
 
-/* ------------ / static methods -------------------------------------------- */
+    /* ------------ / static methods -------------------------------------------- */
 
 
 
@@ -118,10 +118,27 @@ class Migrate {
         }
     }
 
+    /**
+     * Run a to fetch datas
+     *
+     * @param string $sql
+     * @return \PDOStatement
+     * @throws \Exception
+     */
+    public function fetchAll($sql) {
+        try {
+            $sth = $this->run($sql, false);
+            $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
+            return $result;
+        } catch (\PDOException $e) {
+            throw new \Exception("Query error: {$e->getMessage()} - {$sql}");
+        }
+    }
 
 
 
-/* -------------- private methods ------------------------------------------- */
+
+    /* -------------- private methods ------------------------------------------- */
 
     private function database() {
         if ($this->dblol)
@@ -247,5 +264,5 @@ class Migrate {
         return strstr(array_pop($tmp), '.', true);
     }
 
-/* ------------ / private methods ------------------------------------------- */
+    /* ------------ / private methods ------------------------------------------- */
 }

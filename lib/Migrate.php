@@ -43,6 +43,13 @@ class Migrate {
     }
 
     /**
+     * @return \PDO
+     */
+    public function getPdo() {
+        return $this->dblol;
+    }
+
+    /**
      * Execute the migration
      * @param int $maxVersion
      */

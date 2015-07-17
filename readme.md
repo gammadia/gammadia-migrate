@@ -13,7 +13,7 @@ Create a composer.json file in your project root:
 ```json
 {
     "require": {
-        "voilab/migrate": "0.1.*"
+        "voilab/migrate": "0.2.*"
     }
 }
 ```
@@ -21,7 +21,7 @@ Create a composer.json file in your project root:
 Then run the following composer command:
 
 ```bash
-$ php composer.phar install
+$ php composer.phar update
 ```
 
 #### Prerequisites
@@ -78,7 +78,7 @@ If you need other things from your application, just include them the way you wa
 When you have migrations to pass, run your (maybe renamed) 'migrate.php' script in command-line mode.
 
 ```bash
-$ ./migrate.php
+$ php migrate.php
 ```
 
 

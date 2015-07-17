@@ -71,6 +71,11 @@ class Migrate {
 
             $this->updateDatabaseVersion($version);
             $successful += 1;
+
+            // to ensure that every migration is encapsulated, we disconnect and reconnect
+            // to database after each. Quite tough, but useful, trust me :P
+            $this->dblol = null;
+            $this->database();
         }
 
         echo "Migration over.\n";
@@ -92,30 +97,32 @@ class Migrate {
      */
     public function install() {
         $sql = file_get_contents(__DIR__ . '/../install/install.sql');
-        return $this->run($sql);
+        return $this->write($sql);
     }
 
     /**
      * Run a query
      *
      * @param string $sql
-     * @param bool $unbuffer
      * @return \PDOStatement
      * @throws \Exception
      */
-    public function run($sql, $unbuffer = true) {
+    public function run($sql) {
         try {
             $sth = $this->dblol->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             $sth->execute(array());
 
-            if ($unbuffer) {
-                unset($sth);
-                return true;
-            }
             return $sth;
         } catch (\PDOException $e) {
             throw new \Exception("Query error: {$e->getMessage()} - {$sql}");
         }
+    }
+
+    public function write($sql) {
+        $sth = $this->run($sql);
+        unset($sth);
+
+        return true;
     }
 
     /**
@@ -127,7 +134,7 @@ class Migrate {
      */
     public function fetchAll($sql) {
         try {
-            $sth = $this->run($sql, false);
+            $sth = $this->run($sql);
             $result = $sth->fetchAll(\PDO::FETCH_ASSOC);
             return $result;
         } catch (\PDOException $e) {
@@ -161,7 +168,7 @@ class Migrate {
      */
     private function getStart() {
         $sql = "SELECT version FROM migration_version";
-        $sth = $this->run($sql, false);
+        $sth = $this->run($sql);
         $line = $sth->fetch(\PDO::FETCH_ASSOC);
         return $line['version'] + 1;
     }
@@ -206,7 +213,7 @@ class Migrate {
 
     private function updateDatabaseVersion($version) {
         $sql = "UPDATE `migration_version` SET version =" . $version . " WHERE 1;";
-        return $this->run($sql);
+        return $this->write($sql);
     }
 
     /**
@@ -218,9 +225,10 @@ class Migrate {
     private function runSqlMigration($file) {
         try {
             $sql = file_get_contents($file);
-            return $this->run($sql);
+            return $this->write($sql);
         } catch (\Exception $e) {
             echo $e->getMessage() . "\n";
+            echo $e->getTraceAsString() . "\n";
             return false;
         }
     }

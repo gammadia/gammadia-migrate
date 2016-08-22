@@ -160,7 +160,7 @@ class Migrate {
 
         try {
             $db = $this->config['database'];
-            $this->dblol = new \PDO($db['adapter'] . ':host=' . $db['host'] . ';dbname=' . $db['dbname'], $db['user'], $db['pass']);
+            $this->dblol = new \PDO($db['adapter'] . ':host=' . $db['host'] . ';port=' . $db['port'] . ';dbname=' . $db['dbname'], $db['user'], $db['pass']);
             $this->dblol->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\Exception $e) {
             throw new \Exception('Could not connect to database. Message: ' . $e->getMessage());

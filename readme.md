@@ -13,7 +13,7 @@ Create a composer.json file in your project root:
 ```json
 {
     "require": {
-        "voilab/migrate": "0.2.*"
+        "ivru/migrate": "0.2.*"
     }
 }
 ```

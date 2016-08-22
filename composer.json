@@ -1,8 +1,8 @@
 {
-    "name": "voilab/migrate",
+    "name": "ivru/migrate",
     "type": "library",
     "description": "SQL and PHP migration tool for your web application.",
-    "homepage": "https://bitbucket.org/voilab/migrate",
+    "homepage": "https://bitbucket.org/ivru/migrate",
     "license": "MIT",
     "authors": [
         {
@@ -14,7 +14,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "Voilab\\Migrate\\": "lib/"
+            "Ivru\\Migrate\\": "lib/"
         }
     }
 }

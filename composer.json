@@ -4,6 +4,7 @@
     "description": "SQL and PHP migration tool for your web application.",
     "homepage": "https://bitbucket.org/ivru/migrate",
     "license": "MIT",
+    "version": "0.3.0",
     "authors": [
         {
             "name": "Joël Poulin",

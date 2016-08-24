@@ -1,8 +1,8 @@
 {
-    "name": "ivru/migrate",
+    "name": "gammadia/migrate",
     "type": "library",
     "description": "SQL and PHP migration tool for your web application.",
-    "homepage": "https://bitbucket.org/ivru/migrate",
+    "homepage": "http://gammadia.ch/",
     "license": "MIT",
     "version": "0.3.0",
     "authors": [

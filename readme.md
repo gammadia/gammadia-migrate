@@ -13,7 +13,7 @@ Create a composer.json file in your project root:
 ```json
 {
     "require": {
-        "ivru/migrate": "0.3.*"
+        "gammadia/migrate": "0.3.*"
     }
 }
 ```

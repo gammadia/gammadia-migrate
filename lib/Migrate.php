@@ -4,11 +4,14 @@ namespace Voilab\Migrate;
 
 class Migrate {
 
+    /** @var Migrate */
     private static $instance;
+
+    /** @var array{autoload_path: string, migrations_path: string, database: array{adapter: string, dbname: string, host: string, port: string, user: string, pass: string}} */
     private $config;
 
     /**
-     * @var \PDO
+     * @var \PDO|null
      */
     private $dblol;
 
@@ -19,7 +22,7 @@ class Migrate {
     /**
      * Get instance
      *
-     * @param array $config
+     * @param array{autoload_path: string, migrations_path: string, database: array{adapter: string, dbname: string, host: string, port: string, user: string, pass: string}} $config
      * @return Migrate
      */
     public static function getInstance($config) {
@@ -33,8 +36,9 @@ class Migrate {
     /* ------------ / static methods -------------------------------------------- */
 
 
-
-
+    /**
+     * @param array{autoload_path: string, migrations_path: string, database: array{adapter: string, dbname: string, host: string, port: string, user: string, pass: string}} $config
+     */
     private function __construct($config) {
         $this->config = $config;
 
@@ -43,7 +47,7 @@ class Migrate {
     }
 
     /**
-     * @return \PDO
+     * @return \PDO|null
      */
     public function getPdo() {
         return $this->dblol;
@@ -52,6 +56,7 @@ class Migrate {
     /**
      * Execute the migration
      * @param int $maxVersion
+     * @return void
      */
     public function migrateTo($maxVersion) {
         $files = $this->getUpcomingMigrations($maxVersion);
@@ -59,7 +64,7 @@ class Migrate {
         $successful = 0;
         $version_before_migrations = $this->getStart() - 1;
         foreach ($files as $file) {
-            $extension = substr(strrchr($file, '.'), 1);
+            $extension = substr((string) strrchr($file, '.'), 1);
             $version = $this->getVersionFromFilename($file);
 
             $result = false;
@@ -71,8 +76,8 @@ class Migrate {
             }
 
             if (!$result) {
-                echo sprintf("Error: migration %s failed.\n", $version);
-                echo sprintf("Migration process stopped. Database is at version %s.\n", $version-1);
+                echo sprintf("Error: migration %s failed.\n", $file);
+                echo sprintf("Migration process stopped. Database is at version %d.\n", $version-1);
                 die;
             }
 
@@ -86,8 +91,8 @@ class Migrate {
         }
 
         echo "Migration over.\n";
-        if ($successful > 0) {
-            echo sprintf("Migrations done from %s to %s.\n", $version_before_migrations, $version);
+        if ($successful > 0 && isset($version)) {
+            echo sprintf("Migrations done from %d to %d.\n", $version_before_migrations, $version);
             if ($successful > 1) {
                 echo $successful . " files were successfully passed.\n\n";
             } else {
@@ -101,9 +106,11 @@ class Migrate {
 
     /**
      * Execute the installation script
+     *
+     * @return bool
      */
     public function install() {
-        $sql = file_get_contents(__DIR__ . '/../install/install.sql');
+        $sql = (string) file_get_contents(__DIR__ . '/../install/install.sql');
         return $this->write($sql);
     }
 
@@ -116,7 +123,7 @@ class Migrate {
      */
     public function run($sql) {
         try {
-            $sth = $this->dblol->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
+            $sth = $this->database()->prepare($sql, array(\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY));
             $sth->execute(array());
 
             return $sth;
@@ -125,6 +132,11 @@ class Migrate {
         }
     }
 
+    /**
+     * @param string $sql
+     *
+     * @return bool
+     */
     public function write($sql) {
         $sth = $this->run($sql);
         unset($sth);
@@ -136,7 +148,7 @@ class Migrate {
      * Run a to fetch datas
      *
      * @param string $sql
-     * @return \PDOStatement
+     * @return mixed[]|false
      * @throws \Exception
      */
     public function fetchAll($sql) {
@@ -154,14 +166,19 @@ class Migrate {
 
     /* -------------- private methods ------------------------------------------- */
 
+    /**
+     * @return \PDO
+     */
     private function database() {
         if ($this->dblol)
-            return;
+            return $this->dblol;
 
         try {
             $db = $this->config['database'];
             $this->dblol = new \PDO($db['adapter'] . ':host=' . $db['host'] . ';port=' . $db['port'] . ';dbname=' . $db['dbname'], $db['user'], $db['pass']);
             $this->dblol->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+            return $this->dblol;
         } catch (\Exception $e) {
             throw new \Exception('Could not connect to database. Message: ' . $e->getMessage());
         }
@@ -184,12 +201,13 @@ class Migrate {
      * Retrieve the migration that will be run, ordered by version.
      *
      * @param int $maxVersion
-     * @return array
+     * @return string[]
      */
     private function getUpcomingMigrations($maxVersion = null) {
         $start = $this->getStart();
 
-        $files = glob($this->config['migrations_path'] . '*_*.{php,sql}', GLOB_BRACE);
+        /** @var string[] $files */
+        $files = (array) glob($this->config['migrations_path'] . '*_*.{php,sql}', GLOB_BRACE);
 
         $files = array_filter($files, function ($item) use ($start, $maxVersion) {
             $version = $this->getVersionFromFilename($item);
@@ -218,6 +236,11 @@ class Migrate {
         return $files;
     }
 
+    /**
+     * @param int $version
+     *
+     * @return bool
+     */
     private function updateDatabaseVersion($version) {
         $sql = "UPDATE `migration_version` SET version =" . $version . " WHERE 1;";
         return $this->write($sql);
@@ -227,11 +250,11 @@ class Migrate {
      * Run an SQL file
      *
      * @param string $file Migration filename
-     * @return \PDOStatement
+     * @return bool
      */
     private function runSqlMigration($file) {
         try {
-            $sql = file_get_contents($file);
+            $sql = (string) file_get_contents($file);
             return $this->write($sql);
         } catch (\Exception $e) {
             echo $e->getMessage() . "\n";
@@ -272,11 +295,11 @@ class Migrate {
      * Read a filename and guess its version
      *
      * @param string $file Migration filename
-     * @return string
+     * @return int
      */
     private function getVersionFromFilename($file) {
         $tmp = explode('_', $file);
-        return strstr(array_pop($tmp), '.', true);
+        return (int) strstr(array_pop($tmp), '.', true);
     }
 
     /* ------------ / private methods ------------------------------------------- */

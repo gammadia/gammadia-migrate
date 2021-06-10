@@ -12,7 +12,7 @@ class Migration2 {
         $messages = [];
 
         // perform some complex actions that you can't do with SQL
-        $something_went_wrong = true;
+        $something_went_wrong = mt_rand(0, 1);
         if ($something_went_wrong) {
             echo "Something went wrong...";
             return false;

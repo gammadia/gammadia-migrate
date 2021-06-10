@@ -6,18 +6,21 @@
  * You can change this file the way you want... You can also rename $config to another name if it
  * conflicts with your own config file.
  *
- * @var string $autoload_path Path from this file to your composer autoload file
- * @var string $migrations_path Path where your migration files stands
- * @var array $database Your database credentials and configs
+ * @var array{autoload_path: string, migrations_path: string, database: array{adapter: string, dbname: string, host: string, port: string, user: string, pass: string}} $config
  */
 $config = [
+    // Path from this file to your composer autoload file
     'autoload_path' => 'vendor/autoload.php',
+
+    // Path where your migration files stands
     'migrations_path' => __DIR__ . '/migrations/', // with end slash
+
+    // Your database credentials and configs
     'database' => [
         'adapter' => 'mysql',
         'dbname' => 'mydatabase',
         'host' => 'localhost',
-	'port' => '3306',
+        'port' => '3306',
         'user' => 'root',
         'pass' => ''
     ]
@@ -40,7 +43,7 @@ if (count($argv) > 1 && in_array($argv[1], array('--help', '-help', '-h', '-?'))
 } elseif (count($argv) > 1 && in_array($argv[1], array('--install', '-install'))) {
     require_once($config['autoload_path']);
 
-    $migrate = \voilab\migrate\Migrate::getInstance($config);
+    $migrate = \Voilab\Migrate\Migrate::getInstance($config);
     if ($migrate->install()) {
         echo "Success: database correctly configured.\n";
     }
@@ -52,6 +55,6 @@ if (count($argv) > 1 && in_array($argv[1], array('--help', '-help', '-h', '-?'))
         $version = $argv[1];
     }
 
-    $migrate = \voilab\migrate\Migrate::getInstance($config);
+    $migrate = \Voilab\Migrate\Migrate::getInstance($config);
     $migrate->migrateTo($version);
 }

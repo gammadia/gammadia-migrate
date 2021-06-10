@@ -1,18 +1,19 @@
 {
-    "name": "gammadia/migrate",
+    "name": "gammadia/voilab-migrate",
     "type": "library",
-    "description": "SQL and PHP migration tool for your web application.",
-    "homepage": "http://gammadia.ch/",
+    "description": "Fork of voilab/migrate with support for modern PHP versions.",
+    "replace": {
+        "voilab/migrate": "^0.2"
+    },
     "license": "MIT",
-    "version": "0.3.0",
-    "authors": [
-        {
-            "name": "Joël Poulin",
-            "email": "joel@voilab.org",
-            "homepage": "http://www.voilab.org",
-            "role": "Developer"
-        }
-    ],
+    "require": {
+        "php": "^7.2|^8.0",
+        "ext-pdo": "*"
+    },
+    "require-dev": {
+        "overtrue/phplint": "^2.4|^3.0",
+        "phpstan/phpstan": "^0.12"
+    },
     "autoload": {
         "psr-4": {
             "Voilab\\Migrate\\": "lib/"
